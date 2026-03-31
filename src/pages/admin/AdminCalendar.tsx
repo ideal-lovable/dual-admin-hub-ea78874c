@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
 import { SuperAdminLayout } from "@/layouts/SuperAdminLayout";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
@@ -30,16 +31,28 @@ const calendarDays = Array.from({ length: 30 }, (_, i) => {
   return { day, events, hasLive: day === 4 };
 });
 
+const pathToTab: Record<string, string> = {
+  "/admin/calendar": "calendar",
+  "/admin/calendar/scheduled": "scheduled",
+  "/admin/calendar/live": "live",
+  "/admin/calendar/conflicts": "conflicts",
+};
+const tabToPath: Record<string, string> = {
+  calendar: "/admin/calendar",
+  scheduled: "/admin/calendar/scheduled",
+  live: "/admin/calendar/live",
+  conflicts: "/admin/calendar/conflicts",
+};
+
 export default function AdminCalendar() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const activeTab = pathToTab[location.pathname] || "calendar";
   const [detail, setDetail] = useState<any>(null);
 
   return (
-    <SuperAdminLayout
-      title="Livestream Calendar"
-      subtitle="View and manage scheduled livestreams"
-      breadcrumbs={[{ label: "Dashboard", path: "/admin/dashboard" }, { label: "Livestream Calendar" }]}
-    >
-      <Tabs defaultValue="calendar" className="space-y-4">
+    <SuperAdminLayout title="Livestream Calendar" subtitle="View and manage scheduled livestreams" breadcrumbs={[{ label: "Dashboard", path: "/admin/dashboard" }, { label: "Livestream Calendar" }]}>
+      <Tabs value={activeTab} onValueChange={(v) => navigate(tabToPath[v])} className="space-y-4">
         <TabsList className="bg-secondary border border-border">
           <TabsTrigger value="calendar" className="gap-1.5"><Calendar className="h-3.5 w-3.5" /> Calendar</TabsTrigger>
           <TabsTrigger value="live" className="gap-1.5"><Radio className="h-3.5 w-3.5 animate-pulse" /> Live Now ({liveNow.length})</TabsTrigger>
@@ -49,9 +62,7 @@ export default function AdminCalendar() {
 
         <TabsContent value="calendar">
           <Card className="bg-card border-border">
-            <CardHeader>
-              <CardTitle className="text-sm">June 2024</CardTitle>
-            </CardHeader>
+            <CardHeader><CardTitle className="text-sm">June 2024</CardTitle></CardHeader>
             <CardContent>
               <div className="grid grid-cols-7 gap-1 mb-2">
                 {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map(d => (
@@ -59,22 +70,11 @@ export default function AdminCalendar() {
                 ))}
               </div>
               <div className="grid grid-cols-7 gap-1">
-                {/* Offset for June 2024 starting on Saturday */}
                 {Array.from({ length: 6 }, (_, i) => <div key={`empty-${i}`} />)}
                 {calendarDays.map(({ day, events, hasLive }) => (
-                  <div
-                    key={day}
-                    className={`min-h-[80px] rounded-lg border p-1.5 text-xs transition-colors ${
-                      events.length > 0 ? "border-primary/30 bg-primary/5" : hasLive ? "border-accent/30 bg-accent/5" : "border-border bg-secondary/20"
-                    } hover:bg-secondary/40 cursor-pointer`}
-                    onClick={() => events.length > 0 && setDetail(events[0])}
-                  >
+                  <div key={day} className={`min-h-[80px] rounded-lg border p-1.5 text-xs transition-colors ${events.length > 0 ? "border-primary/30 bg-primary/5" : hasLive ? "border-accent/30 bg-accent/5" : "border-border bg-secondary/20"} hover:bg-secondary/40 cursor-pointer`} onClick={() => events.length > 0 && setDetail(events[0])}>
                     <span className="font-medium text-foreground">{day}</span>
-                    {events.map(e => (
-                      <div key={e.id} className="mt-1 rounded bg-primary/20 px-1 py-0.5 text-[9px] text-primary truncate">
-                        {e.title}
-                      </div>
-                    ))}
+                    {events.map(e => <div key={e.id} className="mt-1 rounded bg-primary/20 px-1 py-0.5 text-[9px] text-primary truncate">{e.title}</div>)}
                     {hasLive && <div className="mt-1 rounded bg-accent/20 px-1 py-0.5 text-[9px] text-accent">● LIVE</div>}
                   </div>
                 ))}
@@ -85,7 +85,7 @@ export default function AdminCalendar() {
 
         <TabsContent value="live">
           <div className="grid gap-4 md:grid-cols-3">
-            {liveNow.map((stream) => (
+            {liveNow.map(stream => (
               <Card key={stream.id} className="bg-card border-border hover:border-accent/30 transition-colors">
                 <CardContent className="p-4">
                   <div className="flex items-center gap-2 mb-3">
@@ -99,9 +99,7 @@ export default function AdminCalendar() {
                     <span className="flex items-center gap-1"><Clock className="h-3 w-3" /> {stream.duration}</span>
                     <Badge variant="outline" className="text-[9px]">{stream.category}</Badge>
                   </div>
-                  <Button size="sm" variant="outline" className="w-full mt-3 text-xs" onClick={() => setDetail(stream)}>
-                    <Eye className="h-3 w-3 mr-1" /> Monitor
-                  </Button>
+                  <Button size="sm" variant="outline" className="w-full mt-3 text-xs" onClick={() => setDetail(stream)}><Eye className="h-3 w-3 mr-1" /> Monitor</Button>
                 </CardContent>
               </Card>
             ))}
@@ -110,21 +108,15 @@ export default function AdminCalendar() {
 
         <TabsContent value="scheduled">
           <div className="grid gap-3">
-            {scheduledStreams.map((stream) => (
+            {scheduledStreams.map(stream => (
               <Card key={stream.id} className="bg-card border-border hover:bg-secondary/20 transition-colors cursor-pointer" onClick={() => setDetail(stream)}>
                 <CardContent className="p-4 flex items-center justify-between">
                   <div className="flex items-center gap-4">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <Calendar className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <h3 className="text-sm font-medium">{stream.title}</h3>
-                      <p className="text-xs text-muted-foreground">by {stream.creator}</p>
-                    </div>
+                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center"><Calendar className="h-5 w-5 text-primary" /></div>
+                    <div><h3 className="text-sm font-medium">{stream.title}</h3><p className="text-xs text-muted-foreground">by {stream.creator}</p></div>
                   </div>
                   <div className="flex items-center gap-4 text-xs text-muted-foreground">
-                    <span>{stream.date}</span>
-                    <span>{stream.time}</span>
+                    <span>{stream.date}</span><span>{stream.time}</span>
                     <Badge variant="outline" className="text-[9px]">{stream.category}</Badge>
                   </div>
                 </CardContent>
@@ -144,18 +136,14 @@ export default function AdminCalendar() {
                       <span className="text-sm font-medium">Schedule Overlap</span>
                       <Badge variant="outline" className="text-[9px] border-orange-500/30 text-orange-400">{c.severity}</Badge>
                     </div>
-                    <p className="text-xs text-muted-foreground mb-1">
-                      <span className="font-medium text-foreground">{c.streams.join(" & ")}</span> overlap on {c.date}
-                    </p>
+                    <p className="text-xs text-muted-foreground mb-1"><span className="font-medium text-foreground">{c.streams.join(" & ")}</span> overlap on {c.date}</p>
                     <p className="text-xs text-muted-foreground">Time: {c.time} • Overlap: {c.overlap}</p>
                   </CardContent>
                 </Card>
               ))}
             </div>
           ) : (
-            <Card className="bg-card border-border">
-              <CardContent className="p-8 text-center text-muted-foreground text-sm">No scheduling conflicts detected.</CardContent>
-            </Card>
+            <Card className="bg-card border-border"><CardContent className="p-8 text-center text-muted-foreground text-sm">No scheduling conflicts detected.</CardContent></Card>
           )}
         </TabsContent>
       </Tabs>

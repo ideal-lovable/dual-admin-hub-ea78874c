@@ -1,13 +1,15 @@
-import { AdminLayout } from "@/layouts/AdminLayout";
+import { useState } from "react";
+import { useLocation, useNavigate } from "react-router-dom";
+import { SuperAdminLayout } from "@/layouts/SuperAdminLayout";
 import { DataTable } from "@/components/admin/DataTable";
 import { StatusBadge } from "@/components/admin/StatusBadge";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
-import { Search, MoreHorizontal, Eye, CheckCircle, XCircle, Flag, Video, Radio, Star } from "lucide-react";
-import { useState } from "react";
+import { Search, MoreHorizontal, Eye, CheckCircle, XCircle, Flag, Video, Radio, Star, Calendar, Layers, BarChart3, Package } from "lucide-react";
 import { toast } from "sonner";
 
 interface Content {
@@ -15,7 +17,7 @@ interface Content {
   title: string;
   type: "video" | "livestream" | "creator_pick";
   creator: string;
-  status: "pending" | "approved" | "rejected" | "flagged";
+  status: "pending" | "approved" | "rejected" | "flagged" | "scheduled";
   submitted: string;
   views: string;
 }
@@ -29,11 +31,36 @@ const initialContent: Content[] = [
   { id: 6, title: "Skincare Routine", type: "video", creator: "BeautyQueen", status: "rejected", submitted: "4 days ago", views: "0" },
   { id: 7, title: "Top 10 Board Games", type: "creator_pick", creator: "GameNight", status: "approved", submitted: "1 week ago", views: "1.2K" },
   { id: 8, title: "DIY Home Decor", type: "video", creator: "CraftMaster", status: "pending", submitted: "6 hours ago", views: "0" },
+  { id: 9, title: "Evening Jazz Live", type: "livestream", creator: "JazzCat", status: "scheduled", submitted: "Tomorrow 8 PM", views: "0" },
+  { id: 10, title: "Workout Wednesday", type: "livestream", creator: "FitGuru", status: "scheduled", submitted: "Wed 6 PM", views: "0" },
 ];
 
 const typeIcons: Record<string, React.ElementType> = { video: Video, livestream: Radio, creator_pick: Star };
 
+const pathToTab: Record<string, string> = {
+  "/admin/content": "all",
+  "/admin/content/livestreams": "livestreams",
+  "/admin/content/scheduled": "scheduled",
+  "/admin/content/approval": "pending",
+  "/admin/content/flagged": "flagged",
+  "/admin/content/tools": "tools",
+  "/admin/content/attach-products": "tools",
+  "/admin/content/analytics": "analytics",
+};
+const tabToPath: Record<string, string> = {
+  "all": "/admin/content",
+  "livestreams": "/admin/content/livestreams",
+  "scheduled": "/admin/content/scheduled",
+  "pending": "/admin/content/approval",
+  "flagged": "/admin/content/flagged",
+  "tools": "/admin/content/tools",
+  "analytics": "/admin/content/analytics",
+};
+
 export default function AdminContent() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const activeTab = pathToTab[location.pathname] || "all";
   const [content, setContent] = useState(initialContent);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedContent, setSelectedContent] = useState<Content | null>(null);
@@ -79,7 +106,7 @@ export default function AdminContent() {
   const filtered = content.filter(c => c.title.toLowerCase().includes(searchQuery.toLowerCase()) || c.creator.toLowerCase().includes(searchQuery.toLowerCase()));
 
   return (
-    <AdminLayout type="admin" title="Content Moderation" subtitle="Review and moderate all platform content">
+    <SuperAdminLayout title="Content Management" subtitle="Review and moderate all platform content" breadcrumbs={[{ label: "Dashboard", path: "/admin/dashboard" }, { label: "Content" }]}>
       <div className="space-y-6 animate-slide-up">
         <div className="flex items-center gap-4">
           <div className="relative flex-1 max-w-sm">
@@ -88,19 +115,59 @@ export default function AdminContent() {
           </div>
           <Button variant="secondary" size="sm" onClick={() => { content.filter(c => c.status === "pending").forEach(c => handleApprove(c)); }}><CheckCircle className="h-4 w-4 mr-2" />Approve All Pending</Button>
         </div>
-        <Tabs defaultValue="all">
+        <Tabs value={activeTab} onValueChange={(v) => navigate(tabToPath[v])}>
           <TabsList>
-            <TabsTrigger value="all">All ({filtered.length})</TabsTrigger>
-            <TabsTrigger value="pending">Pending</TabsTrigger>
-            <TabsTrigger value="flagged">Flagged</TabsTrigger>
-            <TabsTrigger value="approved">Approved</TabsTrigger>
-            <TabsTrigger value="rejected">Rejected</TabsTrigger>
+            <TabsTrigger value="all"><Video className="h-3.5 w-3.5 mr-1" />Videos ({filtered.filter(c => c.type === "video").length})</TabsTrigger>
+            <TabsTrigger value="livestreams"><Radio className="h-3.5 w-3.5 mr-1" />Livestreams</TabsTrigger>
+            <TabsTrigger value="scheduled"><Calendar className="h-3.5 w-3.5 mr-1" />Scheduled</TabsTrigger>
+            <TabsTrigger value="pending"><CheckCircle className="h-3.5 w-3.5 mr-1" />Approval Queue</TabsTrigger>
+            <TabsTrigger value="flagged"><Flag className="h-3.5 w-3.5 mr-1" />Flagged</TabsTrigger>
+            <TabsTrigger value="tools"><Layers className="h-3.5 w-3.5 mr-1" />Tools</TabsTrigger>
+            <TabsTrigger value="analytics"><BarChart3 className="h-3.5 w-3.5 mr-1" />Analytics</TabsTrigger>
           </TabsList>
-          <TabsContent value="all"><DataTable columns={columns} data={filtered} /></TabsContent>
-          <TabsContent value="pending"><DataTable columns={columns} data={filtered.filter(c => c.status === "pending")} /></TabsContent>
-          <TabsContent value="flagged"><DataTable columns={columns} data={filtered.filter(c => c.status === "flagged")} /></TabsContent>
-          <TabsContent value="approved"><DataTable columns={columns} data={filtered.filter(c => c.status === "approved")} /></TabsContent>
-          <TabsContent value="rejected"><DataTable columns={columns} data={filtered.filter(c => c.status === "rejected")} /></TabsContent>
+          <TabsContent value="all"><DataTable columns={columns} data={filtered.filter(c => c.type === "video")} /></TabsContent>
+          <TabsContent value="livestreams"><DataTable columns={columns} data={filtered.filter(c => c.type === "livestream")} /></TabsContent>
+          <TabsContent value="scheduled"><DataTable columns={columns} data={filtered.filter(c => c.status === "scheduled")} emptyMessage="No scheduled content" /></TabsContent>
+          <TabsContent value="pending"><DataTable columns={columns} data={filtered.filter(c => c.status === "pending")} emptyMessage="No pending approvals" /></TabsContent>
+          <TabsContent value="flagged"><DataTable columns={columns} data={filtered.filter(c => c.status === "flagged")} emptyMessage="No flagged content" /></TabsContent>
+          <TabsContent value="tools">
+            <div className="grid gap-4 md:grid-cols-2">
+              <Card className="bg-card border-border hover:border-primary/20 transition-colors cursor-pointer" onClick={() => navigate("/admin/content/attach-products")}>
+                <CardContent className="p-6 text-center">
+                  <Package className="h-10 w-10 mx-auto text-primary mb-3" />
+                  <p className="text-sm font-medium">Attach Products</p>
+                  <p className="text-xs text-muted-foreground mt-1">Link products to videos and livestreams</p>
+                </CardContent>
+              </Card>
+              <Card className="bg-card border-border hover:border-primary/20 transition-colors cursor-pointer" onClick={() => navigate("/admin/content/analytics")}>
+                <CardContent className="p-6 text-center">
+                  <BarChart3 className="h-10 w-10 mx-auto text-accent mb-3" />
+                  <p className="text-sm font-medium">Content Analytics</p>
+                  <p className="text-xs text-muted-foreground mt-1">View performance metrics for all content</p>
+                </CardContent>
+              </Card>
+            </div>
+          </TabsContent>
+          <TabsContent value="analytics">
+            <Card className="bg-card border-border">
+              <CardHeader><CardTitle className="text-sm">Content Performance Overview</CardTitle></CardHeader>
+              <CardContent>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                  {[
+                    { label: "Total Videos", value: "1,580" },
+                    { label: "Total Livestreams", value: "380" },
+                    { label: "Avg. Views", value: "2.4K" },
+                    { label: "Engagement Rate", value: "4.8%" },
+                  ].map(s => (
+                    <div key={s.label} className="p-4 rounded-lg bg-secondary/30 text-center">
+                      <p className="text-xl font-bold font-display">{s.value}</p>
+                      <p className="text-xs text-muted-foreground mt-1">{s.label}</p>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
         </Tabs>
       </div>
 
@@ -111,11 +178,6 @@ export default function AdminContent() {
             <div className="space-y-4">
               <div className="aspect-video rounded-lg bg-secondary/50 flex items-center justify-center"><Video className="h-12 w-12 text-muted-foreground" /></div>
               <div><h3 className="font-semibold text-foreground">{selectedContent.title}</h3><p className="text-sm text-muted-foreground">By {selectedContent.creator} • {selectedContent.submitted}</p></div>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="p-3 rounded-lg bg-secondary/30 text-center"><p className="text-xs text-muted-foreground">Type</p><p className="text-sm font-medium text-foreground capitalize">{selectedContent.type.replace("_", " ")}</p></div>
-                <div className="p-3 rounded-lg bg-secondary/30 text-center"><p className="text-xs text-muted-foreground">Status</p><StatusBadge status={selectedContent.status as any} /></div>
-                <div className="p-3 rounded-lg bg-secondary/30 text-center"><p className="text-xs text-muted-foreground">Views</p><p className="text-sm font-medium text-foreground">{selectedContent.views}</p></div>
-              </div>
             </div>
           )}
           <DialogFooter>
@@ -125,6 +187,6 @@ export default function AdminContent() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-    </AdminLayout>
+    </SuperAdminLayout>
   );
 }
