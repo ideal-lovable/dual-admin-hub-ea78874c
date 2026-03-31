@@ -1,12 +1,13 @@
 import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
-  Home, Users, Store, Video, ShoppingCart, BarChart3, Calendar,
-  Star, Handshake, Bell, Shield, Settings, ChevronDown, ChevronRight,
-  Activity, DollarSign, Radio, Eye, Package, FileText, TrendingUp,
+  LayoutDashboard, Users, Store, PlayCircle, ShoppingBag, BarChart3, CalendarDays,
+  Compass, Handshake, BellRing, ShieldCheck, Settings, ChevronDown, ChevronRight,
+  Activity, Wallet, Radio, Eye, Package, FileText, TrendingUp,
   UserCheck, UserX, Flag, Layers, LayoutGrid, Megaphone, Mail,
   Zap, Lock, ClipboardList, Tag, PanelLeftClose, PanelLeft,
-  BarChart, PieChart, Target, Clock, Heart, MapPin, Flame
+  PieChart, Target, Clock, Heart, Flame, Sparkles, ArrowLeftRight,
+  CircleDot
 } from "lucide-react";
 import { Link, useLocation } from "react-router-dom";
 import fvrdLogo from "@/assets/fvrd-logo.png";
@@ -35,27 +36,27 @@ interface NavSection {
 const navSections: NavSection[] = [
   {
     id: "dashboard",
-    icon: Home,
+    icon: LayoutDashboard,
     label: "Dashboard",
     children: [
       { label: "Overview", path: "/admin/dashboard", icon: LayoutGrid },
       { label: "Platform Health", path: "/admin/dashboard/health", icon: Activity },
       { label: "Live Metrics", path: "/admin/dashboard/live", icon: Radio },
-      { label: "Revenue Snapshot", path: "/admin/dashboard/revenue", icon: DollarSign },
+      { label: "Revenue Snapshot", path: "/admin/dashboard/revenue", icon: Wallet },
       { label: "Activity Feed", path: "/admin/dashboard/activity", icon: Clock },
     ],
   },
   {
     id: "users",
     icon: Users,
-    label: "User Management",
+    label: "Users",
     children: [
       { label: "All Users", path: "/admin/users", icon: Users },
       { label: "Subscribers", path: "/admin/users/subscribers", icon: Heart },
-      { label: "Creators", path: "/admin/users/creators", icon: Star },
+      { label: "Creators", path: "/admin/users/creators", icon: Sparkles },
       { label: "Businesses", path: "/admin/users/businesses", icon: Store },
       { label: "Publishers", path: "/admin/users/publishers", icon: Megaphone },
-      { label: "Admins", path: "/admin/users/admins", icon: Shield },
+      { label: "Admins", path: "/admin/users/admins", icon: ShieldCheck },
       {
         label: "Suspended / Flagged",
         path: "/admin/users/suspended",
@@ -71,11 +72,11 @@ const navSections: NavSection[] = [
   {
     id: "storefronts",
     icon: Store,
-    label: "Storefront Management",
+    label: "Storefronts",
     children: [
       { label: "All Storefronts", path: "/admin/storefronts", icon: Store },
       { label: "Pending Approval", path: "/admin/storefronts/pending", icon: Clock },
-      { label: "Featured Stores", path: "/admin/storefronts/featured", icon: Star },
+      { label: "Featured Stores", path: "/admin/storefronts/featured", icon: Sparkles },
       { label: "Categories", path: "/admin/storefronts/categories", icon: Tag },
       { label: "Policy Compliance", path: "/admin/storefronts/compliance", icon: FileText },
       {
@@ -90,14 +91,14 @@ const navSections: NavSection[] = [
   },
   {
     id: "content",
-    icon: Video,
-    label: "Content Management",
+    icon: PlayCircle,
+    label: "Content",
     children: [
-      { label: "Videos (On-demand)", path: "/admin/content", icon: Video },
+      { label: "Videos", path: "/admin/content", icon: PlayCircle },
       { label: "Livestreams", path: "/admin/content/livestreams", icon: Radio },
-      { label: "Scheduled Streams", path: "/admin/content/scheduled", icon: Calendar },
-      { label: "Approval Queue", path: "/admin/content/approval", icon: UserCheck },
-      { label: "Flagged Content", path: "/admin/content/flagged", icon: Flag },
+      { label: "Scheduled", path: "/admin/content/scheduled", icon: CalendarDays },
+      { label: "Approvals", path: "/admin/content/approval", icon: UserCheck },
+      { label: "Flagged", path: "/admin/content/flagged", icon: Flag },
       {
         label: "Content Tools",
         path: "/admin/content/tools",
@@ -111,14 +112,14 @@ const navSections: NavSection[] = [
   },
   {
     id: "commerce",
-    icon: ShoppingCart,
-    label: "Commerce & Orders",
+    icon: ShoppingBag,
+    label: "Commerce",
     children: [
-      { label: "Orders", path: "/admin/commerce/orders", icon: ShoppingCart },
-      { label: "Transactions", path: "/admin/commerce/transactions", icon: DollarSign },
-      { label: "Refunds", path: "/admin/commerce/refunds", icon: FileText },
-      { label: "Payouts", path: "/admin/commerce/payouts", icon: DollarSign },
-      { label: "Cart / Conversion", path: "/admin/commerce/conversion", icon: Target },
+      { label: "Orders", path: "/admin/commerce/orders", icon: ShoppingBag },
+      { label: "Transactions", path: "/admin/commerce/transactions", icon: Wallet },
+      { label: "Refunds", path: "/admin/commerce/refunds", icon: ArrowLeftRight },
+      { label: "Payouts", path: "/admin/commerce/payouts", icon: Wallet },
+      { label: "Conversion", path: "/admin/commerce/conversion", icon: Target },
     ],
   },
   {
@@ -127,11 +128,11 @@ const navSections: NavSection[] = [
     label: "Analytics",
     children: [
       { label: "User Analytics", path: "/admin/analytics", icon: Users },
-      { label: "Revenue Analytics", path: "/admin/analytics/revenue", icon: DollarSign },
-      { label: "Content Performance", path: "/admin/analytics/content", icon: TrendingUp },
-      { label: "Livestream Performance", path: "/admin/analytics/livestreams", icon: Radio },
-      { label: "Store Performance", path: "/admin/analytics/stores", icon: Store },
-      { label: "Conversion Funnels", path: "/admin/analytics/funnels", icon: Target },
+      { label: "Revenue", path: "/admin/analytics/revenue", icon: Wallet },
+      { label: "Content", path: "/admin/analytics/content", icon: TrendingUp },
+      { label: "Livestreams", path: "/admin/analytics/livestreams", icon: Radio },
+      { label: "Stores", path: "/admin/analytics/stores", icon: Store },
+      { label: "Funnels", path: "/admin/analytics/funnels", icon: Target },
       {
         label: "Advanced",
         path: "/admin/analytics/advanced",
@@ -139,33 +140,33 @@ const navSections: NavSection[] = [
         children: [
           { label: "Cohort Analysis", path: "/admin/analytics/cohorts" },
           { label: "Retention", path: "/admin/analytics/retention" },
-          { label: "Engagement Heatmaps", path: "/admin/analytics/heatmaps" },
+          { label: "Heatmaps", path: "/admin/analytics/heatmaps" },
         ],
       },
     ],
   },
   {
     id: "calendar",
-    icon: Calendar,
-    label: "Livestream Calendar",
+    icon: CalendarDays,
+    label: "Calendar",
     children: [
-      { label: "Calendar View", path: "/admin/calendar", icon: Calendar },
-      { label: "Scheduled Streams", path: "/admin/calendar/scheduled", icon: Clock },
+      { label: "Calendar View", path: "/admin/calendar", icon: CalendarDays },
+      { label: "Scheduled", path: "/admin/calendar/scheduled", icon: Clock },
       { label: "Live Now", path: "/admin/calendar/live", icon: Flame },
-      { label: "Conflicts / Overlaps", path: "/admin/calendar/conflicts", icon: Flag },
+      { label: "Conflicts", path: "/admin/calendar/conflicts", icon: Flag },
     ],
   },
   {
     id: "discover",
-    icon: Eye,
-    label: "Discover & Curation",
+    icon: Compass,
+    label: "Discover",
     children: [
       { label: "Featured Banner", path: "/admin/discover/banner", icon: Megaphone },
-      { label: "What to Watch", path: "/admin/discover/watch", icon: Video },
-      { label: "What to Buy", path: "/admin/discover/buy", icon: ShoppingCart },
+      { label: "What to Watch", path: "/admin/discover/watch", icon: PlayCircle },
+      { label: "What to Buy", path: "/admin/discover/buy", icon: ShoppingBag },
       { label: "Trending", path: "/admin/discover/trending", icon: TrendingUp },
-      { label: "Creator Picks", path: "/admin/discover/picks", icon: Star },
-      { label: "Events", path: "/admin/discover/events", icon: Calendar },
+      { label: "Creator Picks", path: "/admin/discover/picks", icon: Sparkles },
+      { label: "Events", path: "/admin/discover/events", icon: CalendarDays },
     ],
   },
   {
@@ -173,15 +174,15 @@ const navSections: NavSection[] = [
     icon: Handshake,
     label: "Creator–Business",
     children: [
-      { label: "Creator Access Control", path: "/admin/mapping/access", icon: Lock },
-      { label: "Product Permissions", path: "/admin/mapping/permissions", icon: Package },
-      { label: "Brand Partnerships", path: "/admin/mapping/partnerships", icon: Handshake },
+      { label: "Access Control", path: "/admin/mapping/access", icon: Lock },
+      { label: "Permissions", path: "/admin/mapping/permissions", icon: Package },
+      { label: "Partnerships", path: "/admin/mapping/partnerships", icon: Handshake },
     ],
   },
   {
     id: "automation",
     icon: Zap,
-    label: "Automation & Notifications",
+    label: "Automation",
     children: [
       { label: "Email Templates", path: "/admin/automation/emails", icon: Mail },
       { label: "Trigger Rules", path: "/admin/automation/triggers", icon: Zap },
@@ -191,13 +192,13 @@ const navSections: NavSection[] = [
   },
   {
     id: "controls",
-    icon: Shield,
+    icon: ShieldCheck,
     label: "Admin Controls",
     children: [
-      { label: "Roles & Permissions", path: "/admin/controls/roles", icon: Shield },
+      { label: "Roles & Permissions", path: "/admin/controls/roles", icon: ShieldCheck },
       { label: "Sub Admins", path: "/admin/controls/sub-admins", icon: UserCheck },
       { label: "Audit Logs", path: "/admin/controls/audit", icon: ClipboardList },
-      { label: "System Settings", path: "/admin/controls/system", icon: Settings },
+      { label: "System", path: "/admin/controls/system", icon: Settings },
     ],
   },
   {
@@ -208,34 +209,35 @@ const navSections: NavSection[] = [
       { label: "Categories", path: "/admin/config/categories", icon: Tag },
       { label: "Metadata", path: "/admin/config/metadata", icon: FileText },
       { label: "Tags", path: "/admin/config/tags", icon: Tag },
-      { label: "Homepage Layout", path: "/admin/config/homepage", icon: LayoutGrid },
+      { label: "Homepage", path: "/admin/config/homepage", icon: LayoutGrid },
       { label: "Discover Layout", path: "/admin/config/discover", icon: Eye },
     ],
   },
 ];
 
+/* ─── Third-level nav item ─── */
 function ThirdLevelItem({ item, collapsed }: { item: NavChild; collapsed: boolean }) {
   const location = useLocation();
   const isActive = location.pathname === item.path;
-
   if (collapsed) return null;
 
   return (
     <Link
       to={item.path}
       className={cn(
-        "flex items-center gap-2 rounded-md px-3 py-1.5 text-xs transition-colors ml-9",
+        "flex items-center gap-2.5 rounded-lg px-3 py-1.5 text-[11px] font-medium transition-all duration-200 ml-10",
         isActive
-          ? "text-primary bg-primary/5 font-medium"
-          : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+          ? "text-primary bg-primary/10"
+          : "text-muted-foreground hover:text-foreground hover:bg-accent/10"
       )}
     >
-      <span className="h-1 w-1 rounded-full bg-current opacity-50" />
+      <CircleDot className="h-2.5 w-2.5 opacity-40" />
       {item.label}
     </Link>
   );
 }
 
+/* ─── Second-level nav item ─── */
 function SecondLevelItem({ item, collapsed }: { item: NavChild; collapsed: boolean }) {
   const location = useLocation();
   const isActive = location.pathname === item.path;
@@ -244,7 +246,6 @@ function SecondLevelItem({ item, collapsed }: { item: NavChild; collapsed: boole
   const [open, setOpen] = useState(isChildActive);
 
   const Icon = item.icon;
-
   if (collapsed) return null;
 
   return (
@@ -253,21 +254,21 @@ function SecondLevelItem({ item, collapsed }: { item: NavChild; collapsed: boole
         <Link
           to={item.path}
           className={cn(
-            "flex-1 flex items-center gap-2.5 rounded-md px-3 py-1.5 text-xs font-medium transition-colors ml-4",
+            "flex-1 flex items-center gap-2.5 rounded-lg px-3 py-[7px] text-[12px] font-medium transition-all duration-200 ml-5",
             isActive || isChildActive
-              ? "text-primary bg-primary/5"
-              : "text-muted-foreground hover:text-foreground hover:bg-secondary/50"
+              ? "text-primary bg-primary/10"
+              : "text-muted-foreground/80 hover:text-foreground hover:bg-accent/10"
           )}
         >
-          {Icon && <Icon className="h-3.5 w-3.5" />}
-          {item.label}
+          {Icon && <Icon className="h-3.5 w-3.5 opacity-70" />}
+          <span className="truncate">{item.label}</span>
         </Link>
         {hasChildren && (
           <button
             onClick={(e) => { e.preventDefault(); setOpen(!open); }}
-            className="p-1 mr-2 text-muted-foreground hover:text-foreground"
+            className="p-1 mr-3 rounded text-muted-foreground/60 hover:text-foreground transition-colors"
           >
-            <ChevronRight className={cn("h-3 w-3 transition-transform", open && "rotate-90")} />
+            <ChevronRight className={cn("h-3 w-3 transition-transform duration-200", open && "rotate-90")} />
           </button>
         )}
       </div>
@@ -282,6 +283,7 @@ function SecondLevelItem({ item, collapsed }: { item: NavChild; collapsed: boole
   );
 }
 
+/* ─── Top-level nav section ─── */
 function NavSectionItem({ section, collapsed, openSection, onToggle }: {
   section: NavSection;
   collapsed: boolean;
@@ -302,29 +304,30 @@ function NavSectionItem({ section, collapsed, openSection, onToggle }: {
     <button
       onClick={() => hasChildren ? onToggle(section.id) : undefined}
       className={cn(
-        "w-full flex items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium transition-all group",
+        "w-full flex items-center gap-3 rounded-xl px-3 py-2.5 text-[13px] font-semibold transition-all duration-200 group",
         isOpen || isChildActive
-          ? "bg-primary/8 text-foreground"
-          : "text-sidebar-foreground hover:bg-sidebar-accent hover:text-sidebar-accent-foreground"
+          ? "bg-primary/10 text-foreground shadow-sm"
+          : "text-muted-foreground hover:bg-accent/8 hover:text-foreground"
       )}
     >
-      <Icon className={cn(
-        "h-4.5 w-4.5 shrink-0",
-        isOpen || isChildActive ? "text-primary" : "text-muted-foreground group-hover:text-foreground"
-      )} />
+      <div className={cn(
+        "flex items-center justify-center h-8 w-8 rounded-lg shrink-0 transition-all duration-200",
+        isOpen || isChildActive
+          ? "bg-primary/15 text-primary shadow-sm"
+          : "bg-secondary/60 text-muted-foreground group-hover:bg-secondary group-hover:text-foreground"
+      )}>
+        <Icon className="h-[18px] w-[18px]" />
+      </div>
       {!collapsed && (
         <>
           <span className="flex-1 text-left truncate">{section.label}</span>
           {hasChildren && (
             <ChevronDown className={cn(
-              "h-3.5 w-3.5 text-muted-foreground transition-transform duration-200",
+              "h-3.5 w-3.5 text-muted-foreground/50 transition-transform duration-300",
               isOpen && "rotate-180"
             )} />
           )}
         </>
-      )}
-      {isChildActive && !collapsed && (
-        <span className="h-1.5 w-1.5 rounded-full bg-primary" />
       )}
     </button>
   );
@@ -340,7 +343,7 @@ function NavSectionItem({ section, collapsed, openSection, onToggle }: {
               trigger
             )}
           </TooltipTrigger>
-          <TooltipContent side="right" className="font-medium">
+          <TooltipContent side="right" className="font-semibold text-xs">
             {section.label}
           </TooltipContent>
         </Tooltip>
@@ -353,7 +356,7 @@ function NavSectionItem({ section, collapsed, openSection, onToggle }: {
       )}
 
       {isOpen && hasChildren && !collapsed && (
-        <div className="mt-1 space-y-0.5 animate-accordion-down">
+        <div className="mt-1.5 mb-1 space-y-0.5 animate-accordion-down">
           {section.children!.map((child) => (
             <SecondLevelItem key={child.path || child.label} item={child} collapsed={collapsed} />
           ))}
@@ -363,6 +366,7 @@ function NavSectionItem({ section, collapsed, openSection, onToggle }: {
   );
 }
 
+/* ─── Main Sidebar ─── */
 export function SuperAdminSidebar() {
   const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
@@ -392,26 +396,29 @@ export function SuperAdminSidebar() {
   return (
     <aside className={cn(
       "fixed left-0 top-0 z-40 h-screen border-r border-sidebar-border bg-sidebar transition-all duration-300",
-      collapsed ? "w-16" : "w-[272px]"
+      collapsed ? "w-[72px]" : "w-[280px]"
     )}>
       <div className="flex h-full flex-col">
         {/* Header */}
         <div className={cn(
-          "flex h-14 items-center border-b border-sidebar-border shrink-0",
-          collapsed ? "justify-center px-2" : "justify-between px-4"
+          "flex items-center shrink-0 border-b border-sidebar-border",
+          collapsed ? "justify-center px-3 h-16" : "justify-between px-5 h-16"
         )}>
-          <div className="flex items-center gap-2.5">
-            <img src={fvrdLogo} alt="FVRD TV" className="h-7 w-auto" />
+          <div className="flex items-center gap-3">
+            <div className="h-9 w-9 rounded-xl bg-primary/15 flex items-center justify-center overflow-hidden shadow-sm">
+              <img src={fvrdLogo} alt="FVRD TV" className="h-6 w-auto" />
+            </div>
             {!collapsed && (
               <div>
-                <p className="text-xs font-semibold text-foreground tracking-wide">Super Admin</p>
+                <p className="text-sm font-bold text-foreground tracking-tight">FVRD TV</p>
+                <p className="text-[10px] font-medium text-muted-foreground tracking-wide uppercase">Super Admin</p>
               </div>
             )}
           </div>
           {!collapsed && (
             <button
               onClick={() => setCollapsed(true)}
-              className="p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+              className="p-2 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-secondary/60 transition-all duration-200"
             >
               <PanelLeftClose className="h-4 w-4" />
             </button>
@@ -421,15 +428,15 @@ export function SuperAdminSidebar() {
         {collapsed && (
           <button
             onClick={() => setCollapsed(false)}
-            className="mx-auto mt-3 p-1.5 rounded-md text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+            className="mx-auto mt-4 p-2 rounded-lg text-muted-foreground/60 hover:text-foreground hover:bg-secondary/60 transition-all duration-200"
           >
             <PanelLeft className="h-4 w-4" />
           </button>
         )}
 
-        {/* Nav */}
-        <ScrollArea className="flex-1 py-3">
-          <nav className={cn("space-y-0.5", collapsed ? "px-2" : "px-3")}>
+        {/* Navigation */}
+        <ScrollArea className="flex-1 py-4">
+          <nav className={cn("space-y-1", collapsed ? "px-2" : "px-3")}>
             {navSections.map((section) => (
               <NavSectionItem
                 key={section.id}
@@ -442,24 +449,24 @@ export function SuperAdminSidebar() {
           </nav>
         </ScrollArea>
 
-        {/* Footer Panel Switcher */}
+        {/* Footer */}
         {!collapsed && (
-          <div className="border-t border-sidebar-border p-3">
-            <p className="mb-2 text-[10px] font-semibold text-muted-foreground uppercase tracking-widest">
+          <div className="border-t border-sidebar-border p-4">
+            <p className="mb-3 text-[10px] font-bold text-muted-foreground/60 uppercase tracking-[0.15em]">
               Switch Panel
             </p>
-            <div className="grid grid-cols-3 gap-1.5">
+            <div className="grid grid-cols-3 gap-2">
               {[
-                { label: "Creator", path: "/user/dashboard", icon: Star },
+                { label: "Creator", path: "/user/dashboard", icon: Sparkles },
                 { label: "Business", path: "/business/dashboard", icon: Store },
                 { label: "Publisher", path: "/publisher/dashboard", icon: Megaphone },
               ].map((p) => (
                 <Link
                   key={p.label}
                   to={p.path}
-                  className="flex flex-col items-center gap-1 rounded-lg py-2 text-[10px] font-medium text-muted-foreground hover:text-foreground hover:bg-secondary/50 transition-colors"
+                  className="flex flex-col items-center gap-1.5 rounded-xl py-2.5 text-[10px] font-semibold text-muted-foreground/70 hover:text-foreground hover:bg-secondary/60 transition-all duration-200"
                 >
-                  <p.icon className="h-3.5 w-3.5" />
+                  <p.icon className="h-4 w-4" />
                   {p.label}
                 </Link>
               ))}
