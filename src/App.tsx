@@ -55,6 +55,7 @@ import AdminDiscover from "./pages/admin/AdminDiscover";
 import AdminAutomation from "./pages/admin/AdminAutomation";
 import AdminCreatorMapping from "./pages/admin/AdminCreatorMapping";
 import AdminPlatformConfig from "./pages/admin/AdminPlatformConfig";
+import AdminControls from "./pages/admin/AdminControls";
 
 const queryClient = new QueryClient();
 
