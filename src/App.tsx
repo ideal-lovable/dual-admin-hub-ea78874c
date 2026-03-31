@@ -55,6 +55,7 @@ import AdminDiscover from "./pages/admin/AdminDiscover";
 import AdminAutomation from "./pages/admin/AdminAutomation";
 import AdminCreatorMapping from "./pages/admin/AdminCreatorMapping";
 import AdminPlatformConfig from "./pages/admin/AdminPlatformConfig";
+import AdminControls from "./pages/admin/AdminControls";
 
 const queryClient = new QueryClient();
 
@@ -110,24 +111,30 @@ const App = () => (
           <Route path="/admin/dashboard/*" element={<AdminDashboard />} />
           <Route path="/admin/users" element={<AdminUsers />} />
           <Route path="/admin/users/*" element={<AdminUsers />} />
-          <Route path="/admin/content" element={<AdminContent />} />
-          <Route path="/admin/content/*" element={<AdminContent />} />
           <Route path="/admin/storefronts" element={<AdminBusinesses />} />
           <Route path="/admin/storefronts/*" element={<AdminBusinesses />} />
-          <Route path="/admin/businesses" element={<AdminBusinesses />} />
-          <Route path="/admin/reports" element={<AdminReports />} />
-          <Route path="/admin/analytics" element={<AdminAnalytics />} />
-          <Route path="/admin/analytics/*" element={<AdminAnalytics />} />
-          <Route path="/admin/settings" element={<AdminSettings />} />
-          <Route path="/admin/calendar" element={<AdminCalendar />} />
-          <Route path="/admin/calendar/*" element={<AdminCalendar />} />
+          <Route path="/admin/businesses" element={<Navigate to="/admin/storefronts" replace />} />
+          <Route path="/admin/content" element={<AdminContent />} />
+          <Route path="/admin/content/*" element={<AdminContent />} />
+          <Route path="/admin/commerce" element={<Navigate to="/admin/commerce/orders" replace />} />
           <Route path="/admin/commerce/orders" element={<AdminCommerceOrders />} />
           <Route path="/admin/commerce/*" element={<AdminCommerceOrders />} />
+          <Route path="/admin/analytics" element={<AdminAnalytics />} />
+          <Route path="/admin/analytics/*" element={<AdminAnalytics />} />
+          <Route path="/admin/calendar" element={<AdminCalendar />} />
+          <Route path="/admin/calendar/*" element={<AdminCalendar />} />
+          <Route path="/admin/discover" element={<Navigate to="/admin/discover/banner" replace />} />
           <Route path="/admin/discover/*" element={<AdminDiscover />} />
-          <Route path="/admin/automation/*" element={<AdminAutomation />} />
+          <Route path="/admin/mapping" element={<Navigate to="/admin/mapping/access" replace />} />
           <Route path="/admin/mapping/*" element={<AdminCreatorMapping />} />
-          <Route path="/admin/controls/*" element={<AdminSettings />} />
+          <Route path="/admin/automation" element={<Navigate to="/admin/automation/emails" replace />} />
+          <Route path="/admin/automation/*" element={<AdminAutomation />} />
+          <Route path="/admin/controls" element={<Navigate to="/admin/controls/roles" replace />} />
+          <Route path="/admin/controls/*" element={<AdminControls />} />
+          <Route path="/admin/config" element={<Navigate to="/admin/config/categories" replace />} />
           <Route path="/admin/config/*" element={<AdminPlatformConfig />} />
+          <Route path="/admin/settings" element={<AdminSettings />} />
+          <Route path="/admin/reports" element={<AdminReports />} />
           
           <Route path="*" element={<NotFound />} />
         </Routes>

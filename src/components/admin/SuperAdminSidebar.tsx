@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { cn } from "@/lib/utils";
 import {
   Home, Users, Store, Video, ShoppingCart, BarChart3, Calendar,
@@ -364,8 +364,26 @@ function NavSectionItem({ section, collapsed, openSection, onToggle }: {
 }
 
 export function SuperAdminSidebar() {
+  const location = useLocation();
   const [collapsed, setCollapsed] = useState(false);
-  const [openSection, setOpenSection] = useState<string | null>("dashboard");
+
+  const getActiveSection = (pathname: string) => {
+    for (const section of navSections) {
+      if (section.children?.some(c =>
+        pathname === c.path ||
+        pathname.startsWith(c.path + '/') ||
+        c.children?.some(gc => pathname === gc.path || pathname.startsWith(gc.path + '/'))
+      )) return section.id;
+    }
+    return "dashboard";
+  };
+
+  const [openSection, setOpenSection] = useState<string | null>(getActiveSection(location.pathname));
+
+  useEffect(() => {
+    const active = getActiveSection(location.pathname);
+    setOpenSection(active);
+  }, [location.pathname]);
 
   const handleToggle = (id: string) => {
     setOpenSection(openSection === id ? null : id);
