@@ -71,7 +71,7 @@ export function SuperAdminLayout({ children, title, subtitle, breadcrumbs }: Sup
     <div className="min-h-screen bg-background">
       <SuperAdminSidebar />
 
-      <div className="ml-[272px] transition-all duration-300">
+      <div className="ml-[280px] transition-all duration-300">
         {/* Top Bar */}
         <header className="sticky top-0 z-30 flex h-14 items-center justify-between border-b border-border bg-background/80 backdrop-blur-xl px-6">
           <div className="flex items-center gap-4">
